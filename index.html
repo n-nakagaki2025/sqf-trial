@@ -225,7 +225,8 @@ footer a{color:var(--muted)}
 const ARTICLE_URL = "https://note.com/s_reflection/n/n6c0dc5b0886c";
 const FORM_URL = "https://docs.google.com/forms/d/1U68fBwKgfqQ9LiDg1SOk-TRq3aetyhV-lnJhqTp0qpA/viewform";
 const STORE_KEY = "sqf-case-trial-v1";
-const BUY_URL = "https://note.com/s_reflection"; // 本編の記事を公開したら、その記事のURLに差し替える
+const BUY_URL = "https://note.com/s_reflection/n/n1678fabb1b1f"; // #49 本編記事
+const HUB_URL = "https://note.com/s_reflection"; // 前のページが分からないときの戻り先（無料窓口を公開したら差し替える）
 
 const Q = {
   c:{nm:"現状把握", en:"Clarifying", sub:"過去 × 外面",
@@ -511,13 +512,17 @@ function end(){
       <li>4つのエリアの資料と、あなたの受講記録をまとめたPDF</li>
     </ul>
     <p class="small muted">スマホでもパソコンでも使えます。ログインは不要で、途中で閉じても同じ端末なら続きから再開できます。</p>
-    <div class="row"><a class="btn" href="${BUY_URL}" target="_blank" rel="noopener">noteに戻る</a></div>
+    <div class="row"><a class="btn" href="${BUY_URL}" rel="noopener">本編記事を見る</a></div>
+    <button class="textbtn" id="back" style="align-self:flex-start">元の場所に戻る</button>
   </section>
   <section class="section">
     <button class="textbtn" id="again" style="align-self:flex-start">もう一度試す</button>
   </section>
   ${footer()}`;
   document.getElementById("again").onclick = ()=>{ reset(); intro(); toTop(); };
+  document.getElementById("back").onclick = ()=>{
+    if(document.referrer && history.length > 1) history.back(); else location.href = HUB_URL;
+  };
 }
 
 /* ---------- PDF ---------- */
