@@ -1,0 +1,681 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<meta name="description" content="SQF（Systemic Questioning Framework）の4つのエリアを、セッションの1場面で試せる無料の体験版です。">
+<title>SQFケース演習 体験版</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@600;800&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Layout: one narrow column, same visual system as the SQF診断. The 2x2 map is both the reference and the selector. */
+:root{
+  --bg:#F5F4F8; --surface:#FFFFFF; --ink:#1F1B2A; --muted:#625C70; --line:#DDD9E5;
+  --accent:#7A2E78; --accent-ink:#FFFFFF;
+  --q-c:#2F639E; --q-m:#2E7D55; --q-k:#B83C34; --q-a:#B07A0E;
+  --q-c-bg:#E7EEF7; --q-m-bg:#E5F2EA; --q-k-bg:#F8E7E5; --q-a-bg:#F7EEDB;
+  /* PDF is always printed light */
+  --p-paper:#FFFFFF; --p-ink:#1F1B2A; --p-muted:#5E586B; --p-line:#E2DEE9; --p-accent:#7A2E78; --p-tint:#F5F1F6;
+  --display:"Shippori Mincho B1","Hiragino Mincho ProN","Yu Mincho",serif;
+  --body:"Zen Kaku Gothic New","Hiragino Sans","Yu Gothic",system-ui,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#17141E; --surface:#221E2B; --ink:#EEEAF4; --muted:#A79FB5; --line:#383244;
+  --accent:#D58BD2; --accent-ink:#1A1520;
+  --q-c:#7FAEE3; --q-m:#79C79D; --q-k:#EE8A80; --q-a:#E6B85A;
+  --q-c-bg:#1E2A3A; --q-m-bg:#1C2D24; --q-k-bg:#35201F; --q-a-bg:#33291A; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#17141E; --surface:#221E2B; --ink:#EEEAF4; --muted:#A79FB5; --line:#383244;
+  --accent:#D58BD2; --accent-ink:#1A1520;
+  --q-c:#7FAEE3; --q-m:#79C79D; --q-k:#EE8A80; --q-a:#E6B85A;
+  --q-c-bg:#1E2A3A; --q-m-bg:#1C2D24; --q-k-bg:#35201F; --q-a-bg:#33291A; color-scheme:dark}
+
+html{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*{box-sizing:border-box}
+body{margin:0;-webkit-text-size-adjust:100%;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.75;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:28px 48px}
+.wrap{max-width:620px;margin:0 auto;display:flex;flex-direction:column;gap:24px}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0;line-height:1.35}
+p{margin:0}
+.eyebrow{font-size:12px;letter-spacing:.14em;color:var(--accent);font-weight:700}
+.muted{color:var(--muted)}
+.small{font-size:14px}
+button{font:inherit;cursor:pointer;color:inherit}
+[hidden]{display:none!important}
+button:disabled{opacity:.6;cursor:progress}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.btn{display:inline-block;background:var(--accent);color:var(--accent-ink);border:0;border-radius:999px;padding:14px 28px;font-weight:700;font-size:16px}
+.btn.ghost{background:transparent;color:var(--accent);border:1.5px solid var(--accent)}
+.textbtn{background:none;border:0;padding:6px 0;color:var(--muted);font-size:14px;text-decoration:underline;text-underline-offset:3px}
+
+/* Map: reference on the intro, selector in each scene */
+.mapwrap{display:flex;flex-direction:column;gap:6px}
+.axes{display:flex;justify-content:space-between;gap:8px;font-size:11px;color:var(--muted);letter-spacing:.04em}
+.map{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.cell{border:2px solid transparent;border-radius:8px;padding:14px;display:flex;flex-direction:column;gap:2px;min-width:0;text-align:left;position:relative;transition:transform .1s,border-color .15s,opacity .2s}
+.cell .nm{font-family:var(--display);font-weight:800;font-size:18px;line-height:1.35}
+.cell .sub{font-size:12px;color:var(--muted)}
+button.cell:active{transform:scale(.98)}
+.c-c{background:var(--q-c-bg)} .c-c .nm{color:var(--q-c)}
+.c-m{background:var(--q-m-bg)} .c-m .nm{color:var(--q-m)}
+.c-k{background:var(--q-k-bg)} .c-k .nm{color:var(--q-k)}
+.c-a{background:var(--q-a-bg)} .c-a .nm{color:var(--q-a)}
+.cell[aria-pressed="true"]{border-color:var(--ink)}
+.map.locked .cell{cursor:default}
+.map.locked .cell:not(.picked):not(.coach){opacity:.45}
+.cell .flags{display:flex;gap:4px;flex-wrap:wrap;margin-top:6px}
+.flag{font-size:11px;font-weight:700;border-radius:999px;padding:0 8px;background:var(--surface);color:var(--ink);border:1px solid var(--line)}
+.flag.you{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.cell .count{font-family:var(--mono);font-size:28px;line-height:1.1;font-variant-numeric:tabular-nums}
+.cell .dots{display:flex;gap:4px;flex-wrap:wrap;min-height:10px;margin-top:4px}
+.cell .dots span{width:10px;height:10px;border-radius:50%;background:currentColor}
+.c-c .dots{color:var(--q-c)} .c-m .dots{color:var(--q-m)} .c-k .dots{color:var(--q-k)} .c-a .dots{color:var(--q-a)}
+
+/* Intro */
+.hero{display:flex;flex-direction:column;gap:14px}
+.hero h1{font-size:clamp(28px,7vw,40px);font-weight:800}
+.hero .lead{font-size:17px}
+.facts{display:flex;flex-wrap:wrap;gap:8px 20px;font-size:14px;color:var(--muted)}
+.facts b{font-family:var(--mono);color:var(--ink);font-weight:500}
+.detail{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px 18px;display:flex;flex-direction:column;gap:8px}
+.detail h3{font-size:19px}
+.dl3{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;margin:0;font-size:15px}
+.dl3 dt{color:var(--muted);font-size:13px;padding-top:2px}
+.dl3 dd{margin:0;min-width:0}
+.note{border-left:4px solid var(--accent);padding:2px 0 2px 14px;font-size:15px}
+.resume{background:var(--surface);border:1.5px solid var(--accent);border-radius:14px;padding:18px 20px;display:flex;flex-direction:column;gap:10px}
+.resume h3{font-size:19px}
+
+/* Scene */
+.progress{display:flex;align-items:center;gap:12px;font-family:var(--mono);font-size:13px;color:var(--muted)}
+.progress .pt{font-family:var(--body);font-weight:700;color:var(--accent)}
+.bar{flex:1;height:4px;background:var(--line);border-radius:2px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--accent);transition:width .3s}
+.scene{display:flex;flex-direction:column;gap:16px}
+.phase{display:flex;flex-direction:column;gap:2px;border-left:4px solid var(--accent);padding-left:12px}
+.phase .p-name{font-family:var(--display);font-weight:800;font-size:22px;line-height:1.4}
+.phase .p-ctx{font-size:15px;color:var(--muted)}
+.quote{background:var(--surface);border:1px solid var(--line);border-radius:4px 16px 16px 16px;padding:18px 20px;font-size:17px;font-weight:500}
+.quote::before{content:"クライアント";display:block;font-size:11px;letter-spacing:.12em;color:var(--muted);font-weight:400;margin-bottom:4px}
+.ask{display:flex;flex-direction:column;gap:2px}
+.ask b{font-size:17px}
+.ask span{font-size:14px;color:var(--muted)}
+
+/* Steps after the pick */
+.step{display:flex;flex-direction:column;gap:12px;padding-top:12px;border-top:1px solid var(--line)}
+.step > h2{font-size:21px}
+.stepno{font-family:var(--mono);font-size:12px;color:var(--muted);letter-spacing:.06em}
+.intent{font-size:14px;color:var(--muted)}
+.intent b{color:var(--ink);font-weight:500}
+textarea{width:100%;min-height:96px;resize:vertical;font:inherit;font-size:16px;line-height:1.6;color:var(--ink);background:var(--surface);border:1.5px solid var(--line);border-radius:10px;padding:12px 14px}
+textarea:focus{border-color:var(--accent);outline:none}
+.skip{font-size:13px;color:var(--muted)}
+.checks{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px;counter-reset:ck}
+.checks li{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px 14px 12px 44px;position:relative;font-size:15px;counter-increment:ck}
+.checks li::before{content:counter(ck);position:absolute;left:14px;top:12px;font-family:var(--mono);font-size:13px;color:var(--accent)}
+.mine{background:var(--surface);border:1.5px solid var(--ink);border-radius:4px 16px 16px 16px;padding:14px 16px;display:flex;flex-direction:column;gap:2px}
+.mine .lb{font-size:11px;letter-spacing:.12em;color:var(--muted)}
+.mine .tx{font-family:var(--display);font-weight:600;font-size:17px;line-height:1.6;white-space:pre-wrap;overflow-wrap:anywhere}
+.pickline{font-size:15px}
+.view{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 16px;display:flex;flex-direction:column;gap:8px}
+.view .when{font-size:13px;font-weight:700;color:var(--accent)}
+.view .read{font-size:15px}
+.view .read::before{content:"見立て";display:block;font-size:11px;letter-spacing:.1em;color:var(--muted)}
+.view .qrow{display:flex;flex-direction:column;gap:4px}
+.chip{align-self:flex-start;font-size:12px;font-weight:700;border-radius:4px;padding:0 8px;white-space:nowrap}
+.k-c{background:var(--q-c-bg);color:var(--q-c)} .k-m{background:var(--q-m-bg);color:var(--q-m)}
+.k-k{background:var(--q-k-bg);color:var(--q-k)} .k-a{background:var(--q-a-bg);color:var(--q-a)}
+.view .q{font-family:var(--display);font-weight:600;font-size:17px;line-height:1.6}
+.callout{border-left:4px solid var(--accent);background:var(--surface);padding:14px 16px;border-radius:0 10px 10px 0;display:flex;flex-direction:column;gap:4px;font-size:15px}
+.callout h3{font-size:16px}
+.nextrow{display:flex;flex-direction:column;align-items:flex-start;gap:6px}
+
+/* Part screens and end */
+.tally{display:flex;gap:12px;flex-wrap:wrap}
+.stat{flex:1 1 140px;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px 16px}
+.stat .k{font-size:12px;color:var(--muted)}
+.stat .v{font-family:var(--mono);font-size:26px;font-variant-numeric:tabular-nums}
+.stat .v small{font-size:14px;color:var(--muted)}
+.section{display:flex;flex-direction:column;gap:12px}
+.section > h2{font-size:22px}
+.log{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.log li{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px 14px;display:flex;flex-direction:column;gap:6px}
+.log .hd{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.log .no{font-family:var(--mono);font-size:13px;color:var(--muted)}
+.log .m{font-size:15px;white-space:pre-wrap;overflow-wrap:anywhere}
+.log .m.empty{color:var(--muted)}
+.ft{width:100%;border-collapse:collapse;font-size:15px;font-variant-numeric:tabular-nums}
+.ft th,.ft td{padding:9px 6px;border-bottom:1px solid var(--line);text-align:left;vertical-align:middle}
+.ft th{font-size:12px;color:var(--muted);font-weight:700}
+.ft th:not(:first-child),.ft td:not(:first-child){text-align:right;white-space:nowrap}
+.ft .tag{font-size:12px;font-weight:700;color:var(--accent);margin-left:6px}
+.dl{background:var(--surface);border:1.5px solid var(--accent);border-radius:14px;padding:22px 20px;display:flex;flex-direction:column;gap:12px}
+.dl h3{font-size:21px}
+.dl ul{margin:0;padding-left:1.2em;display:flex;flex-direction:column;gap:2px}
+.status{font-size:14px;color:var(--muted);min-height:1.5em}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.confirm{display:flex;flex-direction:column;gap:8px;font-size:15px}
+footer{font-size:12px;color:var(--muted);border-top:1px solid var(--line);padding-top:16px;line-height:1.7}
+footer a{color:var(--muted)}
+@media (prefers-reduced-motion: reduce){*{transition:none!important}}
+
+/* PDF pages (rendered offscreen, A4 at 96dpi) */
+#report{position:fixed;left:-20000px;top:0;pointer-events:none}
+.pg{width:794px;height:1123px;background:var(--p-paper);color:var(--p-ink);font-family:var(--body);font-size:13px;line-height:1.75;
+  padding:56px 64px 48px;display:flex;flex-direction:column;gap:16px;overflow:hidden;position:relative}
+.pg h1,.pg h2,.pg h3{font-family:var(--display);color:var(--p-ink)}
+.pg .ph{display:flex;justify-content:space-between;align-items:baseline;border-bottom:2px solid var(--p-accent);padding-bottom:8px;font-size:11px;color:var(--p-muted);letter-spacing:.08em}
+.pg .ph b{color:var(--p-accent);font-size:12px}
+.pg .pf{position:absolute;left:64px;right:64px;bottom:22px;display:flex;justify-content:space-between;font-size:10px;color:var(--p-muted)}
+.pg .eb{font-size:11px;letter-spacing:.16em;color:var(--p-accent);font-weight:700}
+.pg h1{font-size:34px;font-weight:800;line-height:1.25}
+.pg h2{font-size:21px}
+.pg .mu{color:var(--p-muted)}
+.pg .box{border:1px solid var(--p-line);border-radius:8px;padding:12px 14px;display:flex;flex-direction:column;gap:4px}
+.pg .box h4{margin:0;font-size:12px;letter-spacing:.08em;color:var(--p-accent)}
+.pg .stats{display:flex;gap:12px}
+.pg .stats .box{flex:1}
+.pg .big{font-family:var(--mono);font-size:26px;line-height:1.2}
+.pg .big small{font-size:13px;color:var(--p-muted)}
+.pg .sub{color:var(--p-muted)}
+.pg .axes{color:var(--p-muted)}
+.pg .cell{padding:12px}
+.pg .c-c{background:#E7EEF7} .pg .c-c .nm{color:#2F639E} .pg .c-m{background:#E5F2EA} .pg .c-m .nm{color:#2E7D55}
+.pg .c-k{background:#F8E7E5} .pg .c-k .nm{color:#B83C34} .pg .c-a{background:#F7EEDB} .pg .c-a .nm{color:#B07A0E}
+.pg .c-c .dots{color:#2F639E} .pg .c-m .dots{color:#2E7D55} .pg .c-k .dots{color:#B83C34} .pg .c-a .dots{color:#B07A0E}
+.pg .chip{display:inline-block;font-size:11px;font-weight:700;border-radius:4px;padding:0 6px;margin-right:6px}
+.pg .k-c{background:#E7EEF7;color:#2F639E} .pg .k-m{background:#E5F2EA;color:#2E7D55}
+.pg .k-k{background:#F8E7E5;color:#B83C34} .pg .k-a{background:#F7EEDB;color:#B07A0E}
+.pg .area{border-radius:8px;padding:12px 14px;display:flex;flex-direction:column;gap:4px}
+.pg .area .nm{font-family:var(--display);font-weight:800;font-size:17px}
+.pg .area .it{font-weight:700;font-size:12.5px}
+.pg .area dl{display:grid;grid-template-columns:auto 1fr;gap:2px 10px;margin:4px 0 0;font-size:12px}
+.pg .area dt{color:var(--p-muted)} .pg .area dd{margin:0}
+.pg .g2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.pg table{width:100%;border-collapse:collapse;font-size:12px;line-height:1.6}
+.pg th,.pg td{border-bottom:1px solid var(--p-line);padding:7px 6px;text-align:left;vertical-align:top}
+.pg th{font-size:11px;color:var(--p-muted);font-weight:700;background:var(--p-tint)}
+.pg td.an{font-weight:700;white-space:nowrap}
+.pg ul{margin:0;padding-left:1.2em}
+.pg .rc{border:1px solid var(--p-line);border-radius:8px;padding:12px 16px;display:flex;flex-direction:column;gap:6px}
+.pg .rc .hd{display:flex;gap:10px;align-items:baseline}
+.pg .rc .n{font-family:var(--mono);color:var(--p-muted);font-size:12px}
+.pg .rc .pt{font-size:11px;color:var(--p-accent);font-weight:700}
+.pg .rc .say{background:var(--p-tint);border-radius:6px;padding:6px 10px}
+.pg .rc .lbl{font-size:11px;color:var(--p-muted);letter-spacing:.06em;margin-right:6px}
+.pg .rc .ym{border-left:3px solid var(--p-ink);padding-left:10px;white-space:pre-wrap;overflow-wrap:anywhere}
+.pg .rc .ym.empty{border-color:var(--p-line);color:var(--p-muted)}
+.pg .rc .cv{display:flex;flex-direction:column;gap:2px;color:#3A3446}
+.pg .ctaP{border:1.5px solid var(--p-accent);border-radius:10px;padding:14px 18px;display:flex;flex-direction:column;gap:4px}
+.pg .url{font-family:var(--mono);font-size:12px;color:var(--p-accent)}
+.pg .pft td:not(:first-child),.pg .pft th:not(:first-child){text-align:right;font-variant-numeric:tabular-nums}
+.pg .tag{font-size:11px;font-weight:700;color:var(--p-accent);margin-left:6px}
+#measure{width:666px;display:flex;flex-direction:column;gap:12px}
+</style>
+
+</head>
+<body>
+<div class="wrap" id="app"></div>
+<div id="report" aria-hidden="true"></div>
+
+<script>
+const ARTICLE_URL = "https://note.com/s_reflection/n/n6c0dc5b0886c";
+const FORM_URL = "https://docs.google.com/forms/d/1U68fBwKgfqQ9LiDg1SOk-TRq3aetyhV-lnJhqTp0qpA/viewform";
+const STORE_KEY = "sqf-case-trial-v1";
+const BUY_URL = "https://note.com/s_reflection"; // 本編の記事を公開したら、その記事のURLに差し替える
+
+const Q = {
+  c:{nm:"現状把握", en:"Clarifying", sub:"過去 × 外面",
+     purpose:"状況を理解する", effect:"コーチとクライアントの理解がそろう", risk:"尋問されているように感じさせる",
+     intent:"何が起きているかの事実を、コーチとクライアントでそろえる"},
+  m:{nm:"現状の意味づけ", en:"Meaning Making", sub:"過去 × 内面",
+     purpose:"価値観を確かめる", effect:"安心感と信頼感が生まれる", risk:"過度に繰り返すと、焦点が定まらなくなる",
+     intent:"その状況がクライアントにとって何を意味するのかを探る"},
+  k:{nm:"新たな意味づけ", en:"Catalyzing", sub:"未来 × 内面",
+     purpose:"変化を喚起する", effect:"新たな気づきと可能性が開く", risk:"批判されていると感じさせる",
+     intent:"これまでの見方や思い込みを、クライアント自身が問い直す"},
+  a:{nm:"新たな行動", en:"Mobilizing", sub:"未来 × 外面",
+     purpose:"新たな価値観にもとづく行動を決める", effect:"行動への動機づけが高まる", risk:"探索が不十分なまま、表面的な対策で終わる",
+     intent:"生まれた気づきを、具体的な一歩につなげる"}
+};
+const ORDER = ["c","a","m","k"]; // top-left, top-right, bottom-left, bottom-right
+
+const SCENES = [
+  {part:1, phase:"セッション中盤", ctx:"相手が家族であることや、最近言い合いになった場面は、すでに聞いている",
+   say:"自分の大切な人に優しくしたいのに、つい粗を指摘してしまうんです。",
+   views:[
+     {when:"指摘してしまう理由が、まだ見えていないなら", area:"m",
+      read:"指摘してしまう理由は、身近な人だからこその甘えかもしれない。あるいは、本人の性分なのかもしれない。",
+      q:"相手があなたの上司だったとしたら、どのような対応をされますか？"},
+     {when:"優しくなりたい気持ちが、はっきりしているなら", area:"k",
+      read:"本人は、優しくなりたいと思っている。ならば、それを応援したい。",
+      q:"優しくなった自分なら、今の自分にどんな声をかけますか？"}],
+   note:{title:"仮説は、問いの奥に置く", body:"「それは、相手に甘えているだけではないですか？」と聞くと、コーチの仮説を押しつける誘導質問になります。上司に置き換えて問えば、甘えなのか性分なのかを、クライアント自身の答えから確かめられます。"}}
+];
+const N = SCENES.length;
+const PART1_END = SCENES.filter(s=>s.part===1).length;
+
+/* Questions by perspective (from the seminar slides; examples only) */
+const PERSP = {
+  c:{self:["現状において、あなたが最も困っていることは何ですか？","この状況はどのようにして起きましたか？"],
+     around:["この状況には、どのような人が深く関わっていますか？","この状況に近い人々は、それについて何と言っていますか？"],
+     session:["今日のセッションの焦点は何ですか？","今日のセッションをどのように進めたいですか？"]},
+  m:{self:["なぜ今、これがあなたにとって重要なのですか？","将来から見て、今にどのような意味をもたせたいですか？"],
+     around:["周囲の人々にとって、この状況はどのような意味を持ちますか？","周囲の言動は、あなたにとってどのような意味を持ちますか？"],
+     session:["このセッションにどのような意味を感じていますか？","コーチ自身には何を期待しますか？"]},
+  k:{self:["あなたが望む変化を起こすことを妨げているものは何ですか？","それが本当にそうだと、確信した理由はどのようなものですか？"],
+     around:["最も信頼できる人があなたに伝えたいことは何だと思いますか？","周囲には、あなたの強みはどのように映っていると思いますか？"],
+     session:["セッションの中で、あなたが避けてきた話題はありますか？","このセッションで、本当に向き合いたいことに触れていますか？"]},
+  a:{self:["その行動への本気度を1〜10で表すと？ その理由は？","その行動を実際に起こすとしたら、最初の一歩は何ですか？"],
+     around:["目標達成を周囲に助けてもらうとしたら、何がありますか？","目標達成を宣言するとしたら、誰にいつしますか？"],
+     session:["セッションの中で、今後に役立つと感じたことは何ですか？","次回セッションを良いものにするために、どんなことができますか？"]}
+};
+
+/* ---------- state (saved in this browser only) ---------- */
+let S = {seen:false, idx:0, rec:[]};  // rec[i] = {first, memo}
+function load(){ try{ const v = JSON.parse(localStorage.getItem(STORE_KEY)||"null"); if(v && Array.isArray(v.rec)) S = {seen:!!v.seen, idx:Math.min(v.idx|0, v.rec.length, N), rec:v.rec}; }catch(e){} }
+function save(){ try{ localStorage.setItem(STORE_KEY, JSON.stringify(S)); }catch(e){} }
+function reset(){ S = {seen:S.seen, idx:0, rec:[]}; save(); }
+load();
+
+const app = document.getElementById("app");
+let cur = null; // the scene in progress: {first, memo}
+
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
+function pad(n){return String(n).padStart(2,"0")}
+function go(el){ if(el) el.scrollIntoView({behavior:window.matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth", block:"start"}) }
+function toTop(){ window.scrollTo(0,0) }
+
+function mapHTML(mode, opts={}){
+  const cells = ORDER.map(k=>{
+    const picked = opts.pick===k, coach = (opts.coach||[]).includes(k);
+    const flags = [];
+    if(picked) flags.push('<span class="flag you">あなた</span>');
+    if(coach) flags.push('<span class="flag">事例のコーチ</span>');
+    const inner = `<span class="nm">${Q[k].nm}</span><span class="sub">${Q[k].en}｜${Q[k].sub}</span>
+      ${opts.counts?`<span class="count">${opts.counts[k]}</span><span class="dots" aria-hidden="true">${"<span></span>".repeat(opts.counts[k])}</span>`:""}
+      ${flags.length?`<span class="flags">${flags.join("")}</span>`:""}`;
+    if(mode==="static") return `<div class="cell c-${k}">${inner}</div>`;
+    return `<button class="cell c-${k}${picked?" picked":""}${coach?" coach":""}" data-k="${k}" aria-pressed="${picked}"${mode==="locked"?" disabled":""}>${inner}</button>`;
+  }).join("");
+  return `<div class="mapwrap">
+    <div class="axes"><span>↑ Initiating（外面）</span><span>Orienting（過去） ← → Influencing（未来）</span></div>
+    <div class="map${mode==="locked"?" locked":""}" role="group" aria-label="SQFの4つのエリア">${cells}</div>
+    <div class="axes"><span>↓ Reflecting（内面）</span><span>横軸：意図　縦軸：姿勢</span></div>
+  </div>`;
+}
+
+function detailHTML(k){
+  const q = Q[k];
+  return `<div class="detail" id="detail" aria-live="polite">
+    <h3>${q.nm}<span class="muted" style="font-family:var(--body);font-size:13px;font-weight:400">　${q.en}｜${q.sub}</span></h3>
+    <p class="small">${q.intent}</p>
+    <dl class="dl3"><dt>目的</dt><dd>${q.purpose}</dd><dt>効果</dt><dd>${q.effect}</dd><dt>リスク</dt><dd>${q.risk}</dd></dl>
+  </div>`;
+}
+
+/* ---------- intro ---------- */
+function intro(){
+  const inProgress = S.idx>0 && S.idx<N, done = S.idx===N;
+  app.innerHTML = `
+  <header class="hero">
+    <span class="eyebrow">SQF CASE PRACTICE｜体験版</span>
+    <div class="facts"><span>場面 <b>1</b></span><span>所要 <b>約2分</b></span><span>料金 <b>無料</b></span></div>
+  </header>
+  ${inProgress?`<section class="resume">
+    <span class="eyebrow">前回の続き</span>
+    <h3>${N}場面のうち、${S.idx}場面まで終えています</h3>
+    <div class="row"><button class="btn" id="resume">続きから再開する</button><button class="btn ghost" id="toEnd">ここまでのPDFを受け取る</button></div>
+  </section>`:""}
+  ${done?`<section class="resume">
+    <span class="eyebrow">前回の記録</span>
+    <h3>体験版を終えています</h3>
+    <div class="row"><button class="btn" id="toEnd">前回の記録を見る</button></div>
+  </section>`:""}
+  <section class="step" id="practice" style="border-top:0;padding-top:0">
+    <h2>コーチングセッションの場面で、問いを選んでみましょう</h2>
+    <p>クライアントの言葉を読んで、次に問うべき内容を4つのエリアから一つ選んでください。</p>
+    <p class="small muted">体験版は1場面です。最後に、本編（10場面）のご案内があります。</p>
+    <p class="note">正解を当てる演習ではありません。大切なのは、なぜそのエリアを選んだのかを、自分の言葉で言えることです。</p>
+    <div><button class="btn" id="start">${inProgress||done?"もう一度はじめる":"演習をはじめる"}</button></div>
+    <div id="startConfirm"></div>
+  </section>
+  ${footer()}`;
+
+  const seenSet = new Set();
+  app.querySelectorAll(".map .cell").forEach(c=>c.onclick=()=>{
+    const k = c.dataset.k; seenSet.add(k);
+    app.querySelectorAll(".map .cell").forEach(x=>x.setAttribute("aria-pressed", x.dataset.k===k));
+    document.getElementById("detail").outerHTML = detailHTML(k);
+    if(S.seen) return;
+    document.getElementById("seen").textContent = seenSet.size<4
+      ? `4つのうち ${seenSet.size}つを確認しました。4つすべてを確認すると、演習が表示されます。`
+      : "4つすべて確認しました。下に演習が表示されています。";
+    if(seenSet.size===4){ S.seen = true; save(); document.getElementById("practice").hidden = false; }
+  });
+  const r = document.getElementById("resume");
+  if(r) r.onclick = ()=>{ scene(); toTop(); };
+  const e = document.getElementById("toEnd");
+  if(e) e.onclick = ()=>{ end(); toTop(); };
+  document.getElementById("start").onclick = ()=>{
+    if(S.idx===0){ scene(); toTop(); return; }
+    const box = document.getElementById("startConfirm");
+    box.innerHTML = `<div class="confirm"><p>最初からはじめると、前回の記録は消えます。</p>
+      <div class="row"><button class="btn ghost" id="startYes">記録を消して、最初からはじめる</button></div></div>`;
+    document.getElementById("startYes").onclick = ()=>{ reset(); scene(); toTop(); };
+  };
+}
+
+/* ---------- scene: 1 pick → 2 write → 3 check → 4 coach's view ---------- */
+function scene(){
+  const i = S.idx, s = SCENES[i];
+  const lead = "";
+  cur = {first:null, memo:""};
+  app.innerHTML = `
+  <div class="progress"><span>${pad(i+1)} / ${pad(N)}</span><div class="bar"><i style="width:${i/N*100}%"></i></div></div>
+  <section class="scene">
+    ${lead?`<p class="note">${lead}</p>`:""}
+    <div class="phase"><span class="p-name">${s.phase}</span><span class="p-ctx">${s.ctx}</span></div>
+    <p class="quote">${esc(s.say)}</p>
+    <div class="ask"><span class="stepno">STEP 1</span><b>次に、どのエリアの問いを選びますか？</b><span>クライアントが今どんな状態に見えるかを考えてから、地図をタップしてください。</span></div>
+    <div id="mapSlot">${mapHTML("pick")}</div>
+    <div id="writeSlot"></div>
+    <div id="checkSlot"></div>
+    <div id="revealSlot"></div>
+  </section>`;
+  pickMap();
+}
+
+function pickMap(){
+  document.getElementById("mapSlot").innerHTML = mapHTML("pick");
+  app.querySelectorAll("#mapSlot .cell").forEach(c=>c.onclick=()=>write(c.dataset.k));
+}
+
+function write(k){
+  cur.first = k;
+  document.getElementById("mapSlot").innerHTML = mapHTML("pick",{pick:k});
+  app.querySelectorAll("#mapSlot .cell").forEach(c=>c.onclick=()=>{ if(c.dataset.k!==cur.first) write(c.dataset.k); });
+  document.getElementById("writeSlot").innerHTML = `
+  <div class="step" id="writeStep">
+    <span class="stepno">STEP 2</span>
+    <h2>「${Q[k].nm}」の問いを、思い浮かべる</h2>
+    <p class="intent">このエリアの意図：<b>${Q[k].intent}</b></p>
+    <p>クライアントに、どう問いかけますか？ 書かなくて大丈夫です。頭の中で一文にしてみてください。</p>
+    <div class="row"><button class="btn" id="toReveal">思い浮かべたら、見立てを見る</button></div>
+    <p class="skip">見立てを見る前なら、上の地図をタップして、選ぶエリアを変えられます。</p>
+  </div>`;
+  document.getElementById("toReveal").onclick = ()=>{
+    const w = document.getElementById("writeStep");
+    w.querySelector(".row").hidden = true; w.querySelector(".skip").hidden = true;
+    reveal();
+  };
+  go(document.getElementById("writeStep"));
+}
+
+function reveal(){
+  const i = S.idx, s = SCENES[i], k = cur.first;
+  const coach = s.views.map(v=>v.area);
+  document.getElementById("mapSlot").innerHTML = mapHTML("locked",{pick:k, coach});
+  const same = coach.includes(k), multi = s.views.length>1;
+  const pickline = same
+    ? `あなたが選んだ「${Q[k].nm}」は、事例のコーチの見立て${multi?"の一つ":""}と同じでした。`
+    : `あなたは「${Q[k].nm}」を選びました。事例のコーチとは別の見立てです。クライアントのどんな様子から、このエリアを選んだのでしょうか。`;
+  const views = s.views.map((v,j)=>`
+    <div class="view">
+      ${v.when?`<span class="when">見立て${j+1}：${v.when}</span>`:""}
+      <p class="read">${v.read}</p>
+      <div class="qrow"><span class="chip k-${v.area}">${Q[v.area].nm}</span><p class="q">「${v.q}」</p></div>
+    </div>`).join("");
+  const last = i+1===N;
+  document.getElementById("revealSlot").innerHTML = `
+  <div class="step" id="revealStep">
+    <span class="stepno">STEP 3</span>
+    <h2>事例のコーチの見立て</h2>
+    ${cur.memo.trim()?`<div class="mine"><span class="lb">あなたの問い（${Q[k].nm}）</span><p class="tx">${esc(cur.memo)}</p></div>`:""}
+    ${multi?`<p class="small">このコーチは、クライアントの状態によって二通りの見立てを持っていました。どちらを選ぶかは、ここまでの会話で何を聞けているかで決まります。</p>`:""}
+    ${views}
+    <p class="pickline">${pickline}</p>
+    <div class="callout"><h3>「${Q[k].nm}」の問いで気をつけたいこと</h3><p>${Q[k].risk}。</p></div>
+    ${s.note?`<div class="callout"><h3>${s.note.title}</h3><p>${s.note.body}</p></div>`:""}
+    <div class="nextrow">
+      <button class="btn" id="next">${last?"振り返りへ":"次の場面へ"}</button>
+      ${last?"":`<button class="textbtn" id="stopHere">この場面までで終えて、PDFを受け取る</button>`}
+    </div>
+  </div>`;
+  const commit = ()=>{ S.rec[S.idx] = {first:cur.first, memo:cur.memo}; S.idx++; S.rec.length = S.idx; save(); };
+  document.getElementById("next").onclick = ()=>{
+    commit();
+    if(S.idx===N) end(); else scene();
+    toTop();
+  };
+  const st = document.getElementById("stopHere");
+  if(st) st.onclick = ()=>{ commit(); end(); toTop(); };
+  go(document.getElementById("revealStep"));
+}
+
+/* ---------- end ---------- */
+const MIN_FEATURE = 4, TH = 2;
+function summary(){
+  const done = S.idx, complete = done===N;
+  const counts = {c:0,m:0,k:0,a:0}, base = {c:0,m:0,k:0,a:0};
+  S.rec.forEach((r,i)=>{
+    counts[r.first]++;
+    const v = SCENES[i].views; v.forEach(x=>{ base[x.area] += 1/v.length; });
+  });
+  const diff = {}; ORDER.forEach(k=>{ diff[k] = counts[k]-base[k]; });
+  const more = ["c","m","k","a"].filter(k=>diff[k] >= TH-1e-9);
+  const less = ["c","m","k","a"].filter(k=>diff[k] <= -TH+1e-9);
+  const written = S.rec.filter(r=>r.memo && r.memo.trim()).length;
+  const diffs = S.rec.map((r,i)=>({r,i,s:SCENES[i]})).filter(x=>!x.s.views.some(v=>v.area===x.r.first));
+  return {done, complete, counts, base, diff, more, less, written, diffs, enough: done>=MIN_FEATURE};
+}
+function fmt(x){ return Math.abs(x-Math.round(x))<1e-9 ? String(Math.round(x)) : x.toFixed(1); }
+function featureText(t){
+  if(!t.more.length && !t.less.length) return "事例のコーチとほぼ同じ配分で、4つのエリアを選んでいます。";
+  const nm = ks=>ks.map(k=>`「${Q[k].nm}」`).join("と");
+  const parts = [];
+  if(t.more.length) parts.push(`${nm(t.more)}を多めに`);
+  if(t.less.length) parts.push(`${nm(t.less)}を少なめに`);
+  return `事例のコーチと比べて、${parts.join("、")}選んでいます。`;
+}
+const FEATURE_NOTE = "どちらが良い・悪いということではありません。多めに選んでいるエリアは、あなたが自然に使えている問いです。少なめのエリアは、次のセッションで意識して試してみる余地があるところです。";
+function featureTable(t, cls){
+  const tag = k=> t.more.includes(k) ? `<span class="tag">多め</span>` : t.less.includes(k) ? `<span class="tag">少なめ</span>` : "";
+  return `<table class="${cls}"><thead><tr><th>エリア</th><th>あなた</th><th>事例のコーチ</th></tr></thead><tbody>${
+    ["c","m","k","a"].map(k=>`<tr><td><span class="chip k-${k}">${Q[k].nm}</span></td><td>${t.counts[k]}回${tag(k)}</td><td>${fmt(t.base[k])}回</td></tr>`).join("")
+  }</tbody></table>`;
+}
+const BASE_NOTE = "事例のコーチの回数は、あなたが終えた場面での回数です。見立てが二つある場面は、0.5回ずつ数えています。";
+
+function end(){
+  const r = S.rec[0], s0 = SCENES[0];
+  app.innerHTML = `
+  <header class="hero">
+    <span class="eyebrow">体験版を終えました</span>
+    <h1>1場面、試してみました。</h1>
+    <p class="lead">あなたが選んだエリアです。</p>
+  </header>
+  <ul class="log"><li>
+    <div class="hd"><span>${s0.phase}</span><span class="chip k-${r.first}">${Q[r.first].nm}</span></div>
+    <p class="small muted">${esc(s0.say)}</p>
+  </li></ul>
+  <section class="dl">
+    <span class="eyebrow">本編（100円）</span>
+    <h3>続きは、10の場面で。</h3>
+    <ul>
+      <li>一人のクライアントとのセッションを追いかける6場面と、別々のクライアントとの4場面</li>
+      <li>事例のコーチの見立てと比べた、あなたの選び方の特徴</li>
+      <li>4つのエリアの資料と、あなたの受講記録をまとめたPDF</li>
+    </ul>
+    <p class="small muted">スマホでもパソコンでも使えます。ログインは不要で、途中で閉じても同じ端末なら続きから再開できます。</p>
+    <div class="row"><a class="btn" href="${BUY_URL}" target="_blank" rel="noopener">noteに戻る</a></div>
+  </section>
+  <section class="section">
+    <button class="textbtn" id="again" style="align-self:flex-start">もう一度試す</button>
+  </section>
+  ${footer()}`;
+  document.getElementById("again").onclick = ()=>{ reset(); intro(); toTop(); };
+}
+
+/* ---------- PDF ---------- */
+const PAGE_H = 1123, CONTENT_TOP = 56+38, CONTENT_BOTTOM = PAGE_H-48-26; // usable band inside a page
+
+function shell(inner, n, total){
+  return `<div class="pg"><div class="ph"><b>SQFケース演習 受講記録</b><span>${new Date().toLocaleDateString("ja-JP")}</span></div>${inner}
+  <div class="pf"><span>©2026 桜梅桃李コンサルティング｜出典：Hauser (2017) Philosophy of Coaching 2(2), 51–68（CC BY）</span><span>${n} / ${total}</span></div></div>`;
+}
+
+function pageCover(t){
+  return `
+  <div style="display:flex;flex-direction:column;gap:6px"><span class="eb">SQF CASE PRACTICE</span>
+    <h1>SQFケース演習<br>受講記録</h1>
+    <p class="mu">noteの購入者向けの演習です。あなたの演習の記録と、SQFの資料をまとめています。</p></div>
+  <div class="stats">
+    <div class="box"><h4>終えた場面</h4><span class="big">${t.done}<small> / ${N}</small></span></div>
+    <div class="box"><h4>問いを書いた場面</h4><span class="big">${t.written}<small> / ${t.done}</small></span></div>
+  </div>
+  ${t.enough?`
+  <div style="display:flex;flex-direction:column;gap:8px"><span class="eb">あなたの選び方の特徴</span>
+    ${featureTable(t,"pft")}
+    <p class="mu" style="font-size:11.5px">${BASE_NOTE}</p>
+    <p style="font-weight:700">${featureText(t)}</p>
+    ${t.more.length||t.less.length?`<p class="mu">${FEATURE_NOTE}</p>`:""}
+    ${t.diffs.length?`<p class="mu">事例のコーチと見立てが違った場面：${t.diffs.map(x=>pad(x.i+1)).join("、")}（詳しくは受講記録のページ）</p>`:""}
+  </div>`
+  :`<div class="box"><h4>選び方の特徴は、4場面から</h4><p>4場面以上を終えると、事例のコーチの見立てと比べた、あなたの選び方の特徴がこの記録に加わります。同じ端末で演習ページを開くと、続きから再開できます。</p></div>`}
+  <div class="box"><h4>このPDFの中身</h4>
+    <ul><li>4つのエリアの全体図と、目的・効果・リスク</li><li>自分・周囲・セッションの3つの視点の質問例</li><li>GROWモデルとSQFの比較（筆者の整理）</li><li>あなたの受講記録（場面ごとに、選んだエリア・書いた問い・事例のコーチの見立て）</li></ul></div>`;
+}
+
+function pageAreas(){
+  const area = k=>`<div class="area c-${k}"><span class="nm">${Q[k].nm}</span><span class="sub" style="font-size:11px">${Q[k].en}｜${Q[k].sub}</span>
+    <span class="it">${Q[k].intent}</span>
+    <dl><dt>目的</dt><dd>${Q[k].purpose}</dd><dt>効果</dt><dd>${Q[k].effect}</dd><dt>リスク</dt><dd>${Q[k].risk}</dd></dl></div>`;
+  return `
+  <div style="display:flex;flex-direction:column;gap:4px"><span class="eb">FRAMEWORK</span><h2>4つのエリア</h2>
+    <p class="mu">横軸はコーチの意図（Orienting：過去の把握 ← → Influencing：未来への変化）、縦軸はコーチの姿勢（Initiating：外面を主導 ↑ ↓ Reflecting：内面を深掘り）です。</p></div>
+  <div class="axes" style="display:flex;justify-content:space-between;font-size:11px"><span>↑ Initiating（外面）</span><span>Orienting（過去） ← → Influencing（未来）</span></div>
+  <div class="g2">${ORDER.map(area).join("")}</div>
+  <div class="axes" style="display:flex;justify-content:space-between;font-size:11px"><span>↓ Reflecting（内面）</span><span>横軸：意図　縦軸：姿勢</span></div>
+  <div class="box"><h4>使うときの要点</h4><ul>
+    <li>4つのエリアを順番どおりに使う必要はありません。クライアントの状態を見ながら、今どのエリアにいるかを判断し、問いを選びます。</li>
+    <li>多くのセッションは「現状把握 → 現状の意味づけ → 新たな意味づけ → 新たな行動」の順に流れますが、行き来してかまいません。</li>
+    <li>新たな意味づけを飛ばして新たな行動へ進むと、表面的な対策で終わりやすくなります。</li>
+    <li>新たな意味づけに移るときは、コーチの仮説を埋め込んだ誘導質問にならないよう、クライアント自身の言葉を起点にします。</li>
+    <li>ハウザーは、コーチングの介入は関係性の強さ以上には効力を持てない、と述べています。</li></ul></div>`;
+}
+
+function pagePersp(){
+  const cell = arr=>arr.map(x=>`・${x}`).join("<br>");
+  return `
+  <div style="display:flex;flex-direction:column;gap:4px"><span class="eb">QUESTIONS</span><h2>3つの視点の質問例</h2>
+    <p class="mu">同じエリアの問いでも、クライアント自身（自分）、取り巻く人や環境（周囲）、コーチとの関係（セッション）のどこに向けるかで、会話の広がりが変わります。質問例は論文の例を参考に筆者が作成した一例です。そのまま使うのではなく、ご自身の言葉に置き換えてお使いください。</p></div>
+  <table><thead><tr><th style="width:92px">エリア</th><th>自分への問い</th><th>周囲への問い</th><th>セッションへの問い</th></tr></thead>
+  <tbody>${["c","m","k","a"].map(k=>`<tr><td class="an"><span class="chip k-${k}">${Q[k].nm}</span></td><td>${cell(PERSP[k].self)}</td><td>${cell(PERSP[k].around)}</td><td>${cell(PERSP[k].session)}</td></tr>`).join("")}</tbody></table>`;
+}
+
+function pageGrow(){
+  return `
+  <div style="display:flex;flex-direction:column;gap:4px"><span class="eb">GROW × SQF</span><h2>GROWモデルとSQFの比較</h2>
+    <p class="mu">以下は筆者の整理です。SQFはGROWモデルと対立するものではなく、GROWの流れの中で、その場で問いを選ぶ手がかりを加えるものです。</p></div>
+  <table><thead><tr><th style="width:120px">GROWのフェーズ</th><th>内容</th></tr></thead><tbody>
+    <tr><td class="an">Goal（目標）</td><td>セッションで扱うテーマとゴールを明確にする。</td></tr>
+    <tr><td class="an">Reality（現状）</td><td>事実と感情の両面から、現在の状況を客観的に把握する。</td></tr>
+    <tr><td class="an">Option（選択肢）</td><td>目標と現状のギャップを埋めるための選択肢を広げる。</td></tr>
+    <tr><td class="an">Will（意志・行動）</td><td>具体的な行動とコミットメントを引き出す。</td></tr></tbody></table>
+  <table><thead><tr><th style="width:120px">SQFのエリア</th><th>内容</th></tr></thead><tbody>
+    <tr><td class="an"><span class="chip k-c">現状把握</span></td><td>過去から現在の事実を明らかにし、共通理解を築く。</td></tr>
+    <tr><td class="an"><span class="chip k-m">現状の意味づけ</span></td><td>事実の意味を探り、価値観や固定観念を明らかにする。</td></tr>
+    <tr><td class="an"><span class="chip k-k">新たな意味づけ</span></td><td>固定観念や価値観を問い直し、新たな行動のための見方を手にする。</td></tr>
+    <tr><td class="an"><span class="chip k-a">新たな行動</span></td><td>新たな見方を持つ未来の自分に向けて、行動を決める。</td></tr></tbody></table>
+  <table><thead><tr><th style="width:120px">観点</th><th>GROW</th><th>SQF</th></tr></thead><tbody>
+    <tr><td class="an">機能</td><td>セッションの進行順序を示す</td><td>コーチの問いの現在地を示す</td></tr>
+    <tr><td class="an">問いを選ぶ基準</td><td>今のフェーズ</td><td>クライアントの状態</td></tr>
+    <tr><td class="an">進め方</td><td>フェーズの順序に沿って進む</td><td>クライアントの状態に応じて行き来する</td></tr></tbody></table>
+  <p class="mu">筆者の整理では、GoalとRealityのフェーズでは「現状把握」と「現状の意味づけ」、OptionとWillのフェーズでは「新たな意味づけ」と「新たな行動」の問いが中心になります。</p>`;
+}
+
+function recCard(r,i){
+  const s = SCENES[i];
+  const memo = r.memo && r.memo.trim();
+  return `<div class="rc">
+    <div class="hd"><span class="n">${pad(i+1)}</span><span class="pt">${s.part===1?"一つのセッション":"単独の場面"}</span><b>${s.phase}</b><span class="mu" style="font-size:11.5px">${s.ctx}</span></div>
+    <div class="say">クライアント：${esc(s.say)}</div>
+    <div><span class="lbl">あなたの選択</span><span class="chip k-${r.first}">${Q[r.first].nm}</span></div>
+    <div class="ym${memo?"":" empty"}">${memo?esc(r.memo):"（問いは書いていません）"}</div>
+    <div class="cv"><span class="lbl">事例のコーチの見立て</span>
+      ${s.views.map((v,j)=>`<div>${v.when?`<span class="mu">見立て${j+1}：${v.when}　</span>`:""}<span class="chip k-${v.area}">${Q[v.area].nm}</span>「${v.q}」</div>`).join("")}</div>
+  </div>`;
+}
+
+function ctaBlock(){
+  return `<div class="ctaP"><span class="eb">NEXT STEP</span>
+    <p style="font-weight:700;font-size:14px">もっと詳しく知りたい方へ</p>
+    <p>SQFの詳しい解説と、60分のセッション（初回無料）のご案内は、noteの記事「何を質問すべきか分からなくなるコーチへ」にあります。</p>
+    <span class="url">${ARTICLE_URL}</span>
+    <p style="font-weight:700;font-size:14px;margin-top:6px">ご質問はこちら</p>
+    <span class="url" style="word-break:break-all">${FORM_URL}</span>
+    <p class="mu" style="font-size:11px">出典：Hauser, L. L. (2017). The Science Behind Powerful Questioning: A Systemic Questioning Framework for Coach Educators and Practitioners. Philosophy of Coaching: An International Journal, 2(2), 51–68.（CC BY）／4つのエリアの日本語化・質問例・事例は筆者による再構成です。原著者による監修・確認は受けていません。</p>
+  </div>`;
+}
+
+async function buildReport(host){
+  const t = summary();
+  const fixed = [pageCover(t), pageAreas(), pagePersp(), pageGrow()];
+  // measure record cards to pack them into pages
+  const head = `<div style="display:flex;flex-direction:column;gap:4px"><span class="eb">RECORD</span><h2>あなたの受講記録</h2>
+    <p class="mu">場面ごとに、選んだエリア、書いた問い、事例のコーチの見立てを並べています。</p></div>`;
+  const blocks = [head, ...S.rec.map(recCard), ctaBlock()];
+  host.innerHTML = `<div class="pg" style="height:auto"><div id="measure">${blocks.join("")}</div></div>`;
+  if(document.fonts && document.fonts.ready) await document.fonts.ready;
+  const hs = [...document.getElementById("measure").children].map(el=>el.offsetHeight);
+  const limit = CONTENT_BOTTOM - CONTENT_TOP, gap = 12;
+  const recPages = []; let curP = [], used = 0;
+  blocks.forEach((b,idx)=>{
+    const h = hs[idx] + (curP.length?gap:0);
+    if(curP.length && used + h > limit){ recPages.push(curP); curP = []; used = 0; }
+    curP.push(b); used += hs[idx] + (curP.length>1?gap:0);
+  });
+  if(curP.length) recPages.push(curP);
+  const all = [...fixed, ...recPages.map(p=>`<div style="display:flex;flex-direction:column;gap:12px">${p.join("")}</div>`)];
+  host.innerHTML = all.map((inner,n)=>shell(inner, n+1, all.length)).join("");
+}
+
+async function downloadPDF(){
+  const btn = document.getElementById("dl"), st = document.getElementById("dlStatus");
+  if(!window.html2canvas || !window.jspdf){ st.textContent = "PDFの作成機能を読み込めませんでした。ページを再読み込みしてください。"; return; }
+  btn.disabled = true; st.textContent = "PDFを作成しています…";
+  const host = document.getElementById("report");
+  try{
+    await buildReport(host);
+    if(document.fonts && document.fonts.ready) await document.fonts.ready;
+    const {jsPDF} = window.jspdf;
+    const pdf = new jsPDF({unit:"pt", format:"a4", compress:true});
+    const pgs = host.querySelectorAll(".pg");
+    for(let n=0;n<pgs.length;n++){
+      st.textContent = `PDFを作成しています…（${n+1} / ${pgs.length}ページ）`;
+      const cv = await html2canvas(pgs[n], {scale:2, backgroundColor:"#FFFFFF", logging:false});
+      if(n>0) pdf.addPage();
+      pdf.addImage(cv.toDataURL("image/jpeg",0.9), "JPEG", 0, 0, 595.28, 841.89);
+    }
+    pdf.save("SQFケース演習_受講記録.pdf");
+    st.textContent = "PDFを作成しました。";
+  }catch(e){
+    st.textContent = "PDFを作成できませんでした。ページを再読み込みしてからお試しください。";
+  }finally{
+    btn.disabled = false; host.innerHTML = "";
+  }
+}
+
+function footer(){
+  return `<footer>出典：Hauser, L. L. (2017). The Science Behind Powerful Questioning: A Systemic Questioning Framework for Coach Educators and Practitioners. <i>Philosophy of Coaching</i>, 2(2), 51–68. <a href="http://dx.doi.org/10.22316/poc/02.2.04" target="_blank" rel="noopener">doi:10.22316/poc/02.2.04</a>（CC BY）<br>4つのエリアの日本語化・質問例・事例は筆者による再構成です。原著者による監修・確認は受けていません。　©2026 桜梅桃李コンサルティング</footer>`;
+}
+
+intro();
+</script>
+
+</body>
+</html>
